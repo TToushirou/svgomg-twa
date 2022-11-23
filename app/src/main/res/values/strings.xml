@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SVGOMG TWA</string>
+    <string name="twa_offline_first_preferences_file_key">twa_offline_first_preferences</string>
+    <string name="twa_launched_successfully">twa_launched_succesfully</string>
+</resources>

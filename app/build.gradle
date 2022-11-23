@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import groovy.xml.MarkupBuilder;
 
 apply plugin: 'com.android.application'
 
 def twaManifest = [
-    applicationId: 'org.chromium.twa.svgomg',
+    applicationId: 'com.placeholder',
     hostName: 'svgomg.firebaseapp.com', // The domain being opened in the TWA.
     launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
     name: 'SVGOMG TWA', // The name shown on the Android Launcher.
@@ -41,11 +40,11 @@ def twaManifest = [
 ]
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
     defaultConfig {
         applicationId twaManifest.applicationId
-        minSdkVersion 16
-        targetSdkVersion 29
+        minSdkVersion 23
+        targetSdkVersion 33
         versionCode 3
         versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -119,46 +118,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'com.placeholder'
+
+
 }
-
-task generateShorcutsFile {
-    assert twaManifest.shortcuts.size() < 5, "You can have at most 4 shortcuts."
-    twaManifest.shortcuts.eachWithIndex { s, i ->
-        assert s.name != null, 'Missing `name` in shortcut #' + i
-        assert s.short_name != null, 'Missing `short_name` in shortcut #' + i
-        assert s.url != null, 'Missing `icon` in shortcut #' + i
-        assert s.icon != null, 'Missing `url` in shortcut #' + i
-    }
-
-    def shortcutsFile = new File("$projectDir/src/main/res/xml", "shortcuts.xml")
-
-    def xmlWriter = new StringWriter()
-    def xmlMarkup = new MarkupBuilder(new IndentPrinter(xmlWriter, "    ", true))
-
-    xmlMarkup
-        .'shortcuts'('xmlns:android': 'http://schemas.android.com/apk/res/android') {
-            twaManifest.shortcuts.eachWithIndex { s, i ->
-                'shortcut'(
-                        'android:shortcutId': 'shortcut' + i,
-                        'android:enabled': 'true',
-                        'android:icon': '@drawable/' + s.icon,
-                        'android:shortcutShortLabel': '@string/shortcut_short_name_' + i,
-                        'android:shortcutLongLabel': '@string/shortcut_name_' + i) {
-                    'intent'(
-                            'android:action': 'android.intent.action.MAIN',
-                            'android:targetPackage': twaManifest.applicationId,
-                            'android:targetClass': 'com.google.androidbrowserhelper.trusted.LauncherActivity',
-                            'android:data': 'https://' + twaManifest.hostName + s.url)
-                    'categories'('android:name': 'android.intent.category.LAUNCHER')
-                }
-            }
-        }
-    shortcutsFile.text = xmlWriter.toString() + '\n'
-}
-
-preBuild.dependsOn(generateShorcutsFile)
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:1.1.0'
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.4.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.browser:browser:1.4.0'
 }
